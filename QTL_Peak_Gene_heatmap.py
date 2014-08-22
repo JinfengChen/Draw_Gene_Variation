@@ -101,6 +101,45 @@ def set_ticks_XY(ax, xlen, ylen, xlab, ylab):
 
     return ax
 
+def set_ticks_XY_Right(ax, xlen, ylen, xlab, ylab):
+    fig = plt.gcf()
+    #fig.set_size_inches(8, 11)
+
+    # turn off the frame
+    ax.set_frame_on(False)
+    ax.yaxis.set_ticks_position('right')
+
+    # put the major ticks at the middle of each cell
+    ax.set_yticks(np.arange(xlen) + 0.5, minor=False)
+    ax.set_xticks(np.arange(ylen) + 0.5, minor=False)
+
+    # want a more natural, table-like display
+    ax.invert_yaxis()
+    ax.xaxis.tick_top()
+
+    # Set the labels
+    ax.set_xticklabels(xlab, minor=False, fontsize=8)
+    ax.set_yticklabels(ylab, minor=False)
+
+    # rotate the
+    plt.xticks(rotation=40)
+
+    ax.grid(False)
+
+    # Turn off all the ticks
+    ax = plt.gca()
+
+    for t in ax.xaxis.get_major_ticks():
+        t.tick1On = False
+        t.tick2On = False
+    for t in ax.yaxis.get_major_ticks():
+        t.tick1On = False
+        t.tick2On = False
+
+    return ax
+
+
+
 def colorbar(heatmap,  cbaxes, label, ticks, ticke):
     # Add a colorbar below the heatmap
     # add_axes refer to [left, bottom, width, height], where the coordinates are just fractions that go from 0 to 1 of the plotting area.
@@ -112,7 +151,7 @@ def colorbar(heatmap,  cbaxes, label, ticks, ticke):
     cb.set_label('$\mathrm{%s}\ $' %(label))
     #return fig
 
-def heatmap(gene_list, rnaseq1_list, rnaseq2_list, rnaseq3_list, project):
+def heatmap(gene_list, rnaseq1_list, rnaseq2_list, rnaseq3_list, annotation, project):
     # Create a figure.
     figsize=(8,11)
     fig = pl.figure(figsize=figsize)
@@ -124,6 +163,7 @@ def heatmap(gene_list, rnaseq1_list, rnaseq2_list, rnaseq3_list, project):
     rnaseq1 = pd.read_table(rnaseq1_list, index_col=0)
     rnaseq2 = pd.read_table(rnaseq2_list, index_col=0)
     rnaseq3 = pd.read_table(rnaseq3_list, index_col=0)
+    anno = pd.read_table(annotation, sep='\t')
 
     #use truncated color table from 0.2 to 0.8
     cmap = plt.cm.get_cmap("Blues")
@@ -163,7 +203,7 @@ def heatmap(gene_list, rnaseq1_list, rnaseq2_list, rnaseq3_list, project):
     heatmap = ax2.pcolor(rnaseq2, cmap=plt.cm.cool, vmin= -2, vmax= 2, alpha=0.8)
     plt.title('Drought', y=1.065) 
     # Set names for x_ticks only
-    ax2 = set_ticks_X(ax2, rnaseq2.shape[1], rnaseq2.columns)
+    ax2 = set_ticks_X(ax2, rnaseq2.shape[1],  rnaseq2.columns)
 
     # Draw heatmap for gene expression: salt
     #ax = fig.add_subplot(132, frame_on=False) 
@@ -171,7 +211,8 @@ def heatmap(gene_list, rnaseq1_list, rnaseq2_list, rnaseq3_list, project):
     heatmap = ax3.pcolor(rnaseq3, cmap=plt.cm.cool, vmin= -2, vmax= 2, alpha=0.8)
     plt.title('Salt', y=1.065) 
     # Set names for x_ticks only
-    ax3 = set_ticks_X(ax3, rnaseq3.shape[1], rnaseq3.columns)
+    ylabs = anno['Annotation']
+    ax3 = set_ticks_XY_Right(ax3, rnaseq3.shape[0], rnaseq3.shape[1], rnaseq3.columns, ylabs)
     
  
     # Draw LOD curve
@@ -192,6 +233,7 @@ def main():
     parser.add_argument('--rnaseq1')
     parser.add_argument('--rnaseq2')
     parser.add_argument('--rnaseq3')
+    parser.add_argument('--anno')
     parser.add_argument('-o', '--output')
     parser.add_argument('-v', dest='verbose', action='store_true')
     args = parser.parse_args()
@@ -201,7 +243,7 @@ def main():
         usage()
         sys.exit(2)
 
-    heatmap(args.input, args.rnaseq1, args.rnaseq2, args.rnaseq3, args.output)
+    heatmap(args.input, args.rnaseq1, args.rnaseq2, args.rnaseq3, args.anno, args.output)
 
 if __name__ == '__main__':
     main()

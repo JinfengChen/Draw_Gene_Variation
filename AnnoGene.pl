@@ -34,7 +34,7 @@ readgff($opt{gff},$refanno,$refinf,$snp,$indel,$del,$int,$fpkm);
 sub readgff
 {
 my ($file,$refanno,$refinf,$snp,$indel,$del,$int,$fpkm)=@_;
-print "Gene\tSNPeff\tINDELeff\tDELeff\tINTeff\tNB_fpkm\tEG4_fpkm\tFDR\tNB_fpkm\tHEG4_fpkm\tFDR\tAnnotation\tOryzabase\n";
+print "Gene\tSNP\tINDEL\tDEL\tINT\tNB_fpkm\tEG4_fpkm\tFDR\tNB_fpkm\tHEG4_fpkm\tFDR\tAnnotation\tOryzabase\n";
 open IN, "$file" or die "$!";
 while(<IN>){
     chomp $_;

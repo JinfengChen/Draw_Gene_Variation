@@ -40,10 +40,11 @@ def readtable(infile):
                     cmd1 = 'awk \'$1 ~ /%s/ && $4 > %s && $5 < %s\' ../input/MSU7.gene.2.gff > %s.gff' %(unit[0], unit[1], unit[2], prefix)
                     cmd2 = 'perl AnnoGene.pl --gff %s.gff > %s.annotation' %(prefix, prefix)
                     cmd3 = 'python Anno2ggplot.py --input %s.annotation > %s.table' %(prefix, prefix)
-                    cmd4 = 'python QTL_Gene_RNAseq.py --input %s.table --RNAseq ../input/QTL.ColdStress.FPKM.table' %(prefix)
-                    cmd5 = 'python QTL_Gene_RNAseq.py --input %s.table --RNAseq ../input/QTL.Drought.FPKM.table' %(prefix)
-                    cmd6 = 'python QTL_Gene_RNAseq.py --input %s.table --RNAseq ../input/QTL.Salt.FPKM.table' %(prefix)
-                    cmd7 = 'python QTL_Peak_Gene_heatmap.py --input %s.table --rnaseq1 %s.ColdStress.table --rnaseq2 %s.Drought.table --rnaseq3 %s.Salt.table --output %s' %(prefix, prefix, prefix, prefix, prefix)
+                    cmd4 = 'cut -f1,12 %s.annotation > %s.annotation.brief' %(prefix, prefix)
+                    cmd5 = 'python QTL_Gene_RNAseq.py --input %s.table --RNAseq ../input/QTL.ColdStress.FPKM.table' %(prefix)
+                    cmd6 = 'python QTL_Gene_RNAseq.py --input %s.table --RNAseq ../input/QTL.Drought.FPKM.table' %(prefix)
+                    cmd7 = 'python QTL_Gene_RNAseq.py --input %s.table --RNAseq ../input/QTL.Salt.FPKM.table' %(prefix)
+                    cmd8 = 'python QTL_Peak_Gene_heatmap.py --input %s.table --rnaseq1 %s.ColdStress.table --rnaseq2 %s.Drought.table --rnaseq3 %s.Salt.table --anno %s.annotation.brief --output %s' %(prefix, prefix, prefix, prefix, prefix, prefix)
                     os.system(cmd1)
                     os.system(cmd2)
                     os.system(cmd3)
@@ -51,6 +52,7 @@ def readtable(infile):
                     os.system(cmd5)
                     os.system(cmd6)
                     os.system(cmd7)
+                    os.system(cmd8)
     return data
 
 
