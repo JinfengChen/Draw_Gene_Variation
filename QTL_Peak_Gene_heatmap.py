@@ -101,7 +101,7 @@ def set_ticks_XY(ax, xlen, ylen, xlab, ylab):
 
     return ax
 
-def colorbar(heatmap,  cbaxes, ticks, ticke):
+def colorbar(heatmap,  cbaxes, label, ticks, ticke):
     # Add a colorbar below the heatmap
     # add_axes refer to [left, bottom, width, height], where the coordinates are just fractions that go from 0 to 1 of the plotting area.
     #cbaxes = fig.add_axes([0.15, 0.15, 0.2, 0.02]) 
@@ -109,19 +109,21 @@ def colorbar(heatmap,  cbaxes, ticks, ticke):
     #cb = pl.colorbar(heatmap, orientation='horizontal', shrink=0.5825,
     #                 fraction=0.02, pad=-0.035,ticks=np.linspace(-1, 1, 5),
     #                 use_gridspec=True)
-    #cb.set_label("$\mathrm{Pearson's}\ r$")
+    cb.set_label('$\mathrm{%s}\ $' %(label))
     #return fig
 
-def heatmap(gene_list, rnaseq_list, project):
+def heatmap(gene_list, rnaseq1_list, rnaseq2_list, rnaseq3_list, project):
     # Create a figure.
     figsize=(8,11)
     fig = pl.figure(figsize=figsize)
     pl.subplots_adjust(bottom=0.2)
-    gs = gridspec.GridSpec(1, 3, width_ratios=[2, 2, 1])
+    gs = gridspec.GridSpec(1, 4, width_ratios=[1, 1.5, 1.5, 1.5])
 
     # Read Dataframe from file
     qtl = pd.read_table(gene_list, index_col=0)
-    rnaseq = pd.read_table(rnaseq_list, index_col=0)
+    rnaseq1 = pd.read_table(rnaseq1_list, index_col=0)
+    rnaseq2 = pd.read_table(rnaseq2_list, index_col=0)
+    rnaseq3 = pd.read_table(rnaseq3_list, index_col=0)
 
     #use truncated color table from 0.2 to 0.8
     cmap = plt.cm.get_cmap("Blues")
@@ -137,28 +139,42 @@ def heatmap(gene_list, rnaseq_list, project):
     
     ticks0 = 0
     ticke0 = 1 
-    cbaxes0 = fig.add_axes([0.15, 0.15, 0.2, 0.02])
-    colorbar(heatmap, cbaxes0, ticks0, ticke0)
+    cbaxes0 = fig.add_axes([0.08, 0.15, 0.2, 0.02])
+    colorbar(heatmap, cbaxes0, 'Variation Effect', ticks0, ticke0)
     
-    # Draw heatmap for gene expression
+    # Draw heatmap for gene expression: cold
     #ax = fig.add_subplot(132, frame_on=False) 
     ax1 = plt.subplot(gs[1])
-    heatmap = ax1.pcolor(rnaseq, cmap=plt.cm.cool, alpha=0.8)    
+    heatmap = ax1.pcolor(rnaseq1, cmap=plt.cm.cool, alpha=0.8)    
     # Set names for x_ticks only
-    ax1 = set_ticks_X(ax1, rnaseq.shape[1], rnaseq.columns)
+    ax1 = set_ticks_X(ax1, rnaseq1.shape[1], rnaseq1.columns)
     
     ticks1 = -2
     ticke1 = 4
     cbaxes1 = fig.add_axes([0.5, 0.15, 0.2, 0.02])
-    colorbar(heatmap, cbaxes1, ticks1, ticke1)
+    colorbar(heatmap, cbaxes1, 'Log2(HEG4/NB)', ticks1, ticke1)
+
+   # Draw heatmap for gene expression: drought
+    #ax = fig.add_subplot(132, frame_on=False) 
+    ax2 = plt.subplot(gs[2])
+    heatmap = ax2.pcolor(rnaseq2, cmap=plt.cm.cool, alpha=0.8)    
+    # Set names for x_ticks only
+    ax2 = set_ticks_X(ax2, rnaseq2.shape[1], rnaseq2.columns)
+
+    # Draw heatmap for gene expression: salt
+    #ax = fig.add_subplot(132, frame_on=False) 
+    ax3 = plt.subplot(gs[3])
+    heatmap = ax3.pcolor(rnaseq3, cmap=plt.cm.cool, alpha=0.8)    
+    # Set names for x_ticks only
+    ax3 = set_ticks_X(ax3, rnaseq3.shape[1], rnaseq3.columns)
+    
  
     # Draw LOD curve
-    #ax = fig.add_subplot(133, frame_on=True)
-    ax2 = plt.subplot(gs[2])
-    x=random.sample(range(1,20),6)
-    y=np.arange(6)
-    plt.xlim=(10,20)
-    ax2.plot(x,y)
+    #ax2 = plt.subplot(gs[2])
+    #x=random.sample(range(1,20),6)
+    #y=np.arange(6)
+    #plt.xlim=(10,20)
+    #ax2.plot(x,y)
     # Set names for x_ticks 
     #ax2 = set_ticks_X(ax2)
 
@@ -168,17 +184,19 @@ def heatmap(gene_list, rnaseq_list, project):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', '--input')
-    parser.add_argument('-r', '--rnaseq')
+    parser.add_argument('--rnaseq1')
+    parser.add_argument('--rnaseq2')
+    parser.add_argument('--rnaseq3')
     parser.add_argument('-o', '--output')
     parser.add_argument('-v', dest='verbose', action='store_true')
     args = parser.parse_args()
     try:
-        len(args.input) > 0 and len(args.rnaseq) > 0
+        len(args.input) > 0 and len(args.rnaseq1) > 0
     except:
         usage()
         sys.exit(2)
 
-    heatmap(args.input, args.rnaseq, args.output)
+    heatmap(args.input, args.rnaseq1, args.rnaseq2, args.rnaseq3, args.output)
 
 if __name__ == '__main__':
     main()
