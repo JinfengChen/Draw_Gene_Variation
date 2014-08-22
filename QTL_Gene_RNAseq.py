@@ -39,7 +39,7 @@ def readgene(infile):
                 data[unit[0]] = line
     return data
 
-def sub_rnaseq(gene, rnaseq, filename):
+def sub_rnaseq(gene, rnaseq, filename, stress):
     ofile = open(filename, 'w')
     print >> ofile, rnaseq['Gene']
     for g in sorted(gene.keys()):
@@ -47,7 +47,10 @@ def sub_rnaseq(gene, rnaseq, filename):
             if rnaseq.has_key(g):
                 print >> ofile, rnaseq[g]
             else:
-                print >> ofile, '%s\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0' %(g) 
+                if stress == 'Salt':
+                    print >> ofile, '%s\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0' %(g)
+                else:
+                    print >> ofile, '%s\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0' %(g) 
 
 def main():
     parser = argparse.ArgumentParser()
@@ -70,7 +73,7 @@ def main():
     stress = re.split(r'\.', os.path.basename(str(args.RNAseq)))[1]
 
     filename = '%s.%s.table' %(prefix, stress)
-    sub_rnaseq(gene, rnaseq, filename)
+    sub_rnaseq(gene, rnaseq, filename, stress)
 
 if __name__ == '__main__':
     main()

@@ -39,11 +39,11 @@ def set_ticks_X(ax, ylen, ylab):
     ax.xaxis.tick_top()
 
     # Set the labels
-    ax.set_xticklabels(ylab, minor=False)
+    ax.set_xticklabels(ylab, minor=False, fontsize=8)
     ax.set_yticklabels([])
 
     # rotate the
-    plt.xticks(rotation=90)
+    plt.xticks(rotation=40)
 
     ax.grid(False)
 
@@ -117,7 +117,7 @@ def heatmap(gene_list, rnaseq1_list, rnaseq2_list, rnaseq3_list, project):
     figsize=(8,11)
     fig = pl.figure(figsize=figsize)
     pl.subplots_adjust(bottom=0.2)
-    gs = gridspec.GridSpec(1, 4, width_ratios=[1, 1.5, 1.5, 1.5])
+    gs = gridspec.GridSpec(1, 4, width_ratios=[1, 3, 3, 3])
 
     # Read Dataframe from file
     qtl = pd.read_table(gene_list, index_col=0)
@@ -132,39 +132,44 @@ def heatmap(gene_list, rnaseq1_list, rnaseq2_list, rnaseq3_list, project):
 
     # Draw heatmap for variations
     #ax = fig.add_subplot(131, frame_on=False)
+    #ax = fig.add_subplot(133, frame_on=True)
     ax0 = plt.subplot(gs[0])
-    heatmap = ax0.pcolor(qtl, cmap=new_cmap, alpha=0.8)
+    heatmap = ax0.pcolor(qtl, cmap=new_cmap, alpha=0.8, vmin= 0, vmax= 4)
     # Set names for x,y_ticks
     ax0 = set_ticks_XY(ax0, qtl.shape[0], qtl.shape[1], qtl.columns, qtl.index)
     
     ticks0 = 0
-    ticke0 = 1 
-    cbaxes0 = fig.add_axes([0.08, 0.15, 0.2, 0.02])
+    ticke0 = 4 
+    cbaxes0 = fig.add_axes([0.08, 0.18, 0.2, 0.02])
     colorbar(heatmap, cbaxes0, 'Variation Effect', ticks0, ticke0)
     
     # Draw heatmap for gene expression: cold
     #ax = fig.add_subplot(132, frame_on=False) 
     ax1 = plt.subplot(gs[1])
-    heatmap = ax1.pcolor(rnaseq1, cmap=plt.cm.cool, alpha=0.8)    
+    heatmap = ax1.pcolor(rnaseq1, cmap=plt.cm.cool, vmin= -2, vmax= 2, alpha=0.8)  
+    plt.title('Cold', y=1.065) 
     # Set names for x_ticks only
     ax1 = set_ticks_X(ax1, rnaseq1.shape[1], rnaseq1.columns)
+    #ax = fig.add_subplot(133, frame_on=True)
     
     ticks1 = -2
-    ticke1 = 4
-    cbaxes1 = fig.add_axes([0.5, 0.15, 0.2, 0.02])
+    ticke1 = 2
+    cbaxes1 = fig.add_axes([0.47, 0.18, 0.2, 0.02])
     colorbar(heatmap, cbaxes1, 'Log2(HEG4/NB)', ticks1, ticke1)
 
    # Draw heatmap for gene expression: drought
     #ax = fig.add_subplot(132, frame_on=False) 
     ax2 = plt.subplot(gs[2])
-    heatmap = ax2.pcolor(rnaseq2, cmap=plt.cm.cool, alpha=0.8)    
+    heatmap = ax2.pcolor(rnaseq2, cmap=plt.cm.cool, vmin= -2, vmax= 2, alpha=0.8)
+    plt.title('Drought', y=1.065) 
     # Set names for x_ticks only
     ax2 = set_ticks_X(ax2, rnaseq2.shape[1], rnaseq2.columns)
 
     # Draw heatmap for gene expression: salt
     #ax = fig.add_subplot(132, frame_on=False) 
     ax3 = plt.subplot(gs[3])
-    heatmap = ax3.pcolor(rnaseq3, cmap=plt.cm.cool, alpha=0.8)    
+    heatmap = ax3.pcolor(rnaseq3, cmap=plt.cm.cool, vmin= -2, vmax= 2, alpha=0.8)
+    plt.title('Salt', y=1.065) 
     # Set names for x_ticks only
     ax3 = set_ticks_X(ax3, rnaseq3.shape[1], rnaseq3.columns)
     

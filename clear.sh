@@ -1,0 +1,2 @@
+rm *.table *.annotation *.gff
+
