@@ -39,11 +39,11 @@ def set_ticks_X(ax, ylen, ylab):
     ax.xaxis.tick_top()
 
     # Set the labels
-    ax.set_xticklabels(ylab, minor=False, fontsize=8)
+    ax.set_xticklabels(ylab, minor=False)
     ax.set_yticklabels([])
 
     # rotate the
-    plt.xticks(rotation=40)
+    plt.xticks(rotation=90)
 
     ax.grid(False)
 
@@ -101,47 +101,7 @@ def set_ticks_XY(ax, xlen, ylen, xlab, ylab):
 
     return ax
 
-def set_ticks_XY_Right(ax, xlen, ylen, xlab, ylab):
-    fig = plt.gcf()
-    #fig.set_size_inches(8, 11)
-
-    # turn off the frame
-    ax.set_frame_on(False)
-    ax.yaxis.set_ticks_position('right')
-
-    # put the major ticks at the middle of each cell
-    ax.set_yticks(np.arange(xlen) + 0.5, minor=False)
-    ax.set_xticks(np.arange(ylen) + 0.5, minor=False)
-
-    # want a more natural, table-like display
-    ax.invert_yaxis()
-    ax.xaxis.tick_top()
-
-    # Set the labels
-    ax.set_xticklabels(xlab, minor=False, fontsize=8)
-    ax.set_yticklabels(ylab, minor=False)
-
-    # rotate the
-    plt.xticks(rotation=40)
-
-    ax.grid(False)
-
-    # Turn off all the ticks
-    ax = plt.gca()
-
-    for t in ax.xaxis.get_major_ticks():
-        t.tick1On = False
-        t.tick2On = False
-    for t in ax.yaxis.get_major_ticks():
-        t.tick1On = False
-        t.tick2On = False
-
-    return ax
-
-def linecount(filename):
-    return len(open(filename).readlines())
-
-def colorbar(heatmap,  cbaxes, label, ticks, ticke):
+def colorbar(heatmap,  cbaxes, ticks, ticke):
     # Add a colorbar below the heatmap
     # add_axes refer to [left, bottom, width, height], where the coordinates are just fractions that go from 0 to 1 of the plotting area.
     #cbaxes = fig.add_axes([0.15, 0.15, 0.2, 0.02]) 
@@ -149,25 +109,19 @@ def colorbar(heatmap,  cbaxes, label, ticks, ticke):
     #cb = pl.colorbar(heatmap, orientation='horizontal', shrink=0.5825,
     #                 fraction=0.02, pad=-0.035,ticks=np.linspace(-1, 1, 5),
     #                 use_gridspec=True)
-    cb.set_label('$\mathrm{%s}\ $' %(label))
+    #cb.set_label("$\mathrm{Pearson's}\ r$")
     #return fig
 
 def heatmap(gene_list, rnaseq1_list, rnaseq2_list, rnaseq3_list, annotation, project):
-    
-    genecount = linecount(gene_list)
-    fheight = genecount * 0.25
     # Create a figure.
-    figsize=(8,fheight)
+    figsize=(8,11)
     fig = pl.figure(figsize=figsize)
     pl.subplots_adjust(bottom=0.2)
-    gs = gridspec.GridSpec(1, 4, width_ratios=[1, 3, 3, 3])
+    gs = gridspec.GridSpec(1, 3, width_ratios=[2, 2, 1])
 
     # Read Dataframe from file
     qtl = pd.read_table(gene_list, index_col=0)
-    rnaseq1 = pd.read_table(rnaseq1_list, index_col=0)
-    rnaseq2 = pd.read_table(rnaseq2_list, index_col=0)
-    rnaseq3 = pd.read_table(rnaseq3_list, index_col=0)
-    anno = pd.read_table(annotation, sep='\t')
+    rnaseq = pd.read_table(rnaseq1_list, index_col=0)
 
     #use truncated color table from 0.2 to 0.8
     cmap = plt.cm.get_cmap("Blues")
@@ -176,55 +130,35 @@ def heatmap(gene_list, rnaseq1_list, rnaseq2_list, rnaseq3_list, annotation, pro
 
     # Draw heatmap for variations
     #ax = fig.add_subplot(131, frame_on=False)
-    #ax = fig.add_subplot(133, frame_on=True)
     ax0 = plt.subplot(gs[0])
-    heatmap = ax0.pcolor(qtl, cmap=new_cmap, alpha=0.8, vmin= 0, vmax= 4)
+    heatmap = ax0.pcolor(qtl, cmap=new_cmap, alpha=0.8)
     # Set names for x,y_ticks
     ax0 = set_ticks_XY(ax0, qtl.shape[0], qtl.shape[1], qtl.columns, qtl.index)
     
     ticks0 = 0
-    ticke0 = 4 
-    cbaxes0 = fig.add_axes([0.08, 0.18, 0.2, 0.02])
-    colorbar(heatmap, cbaxes0, 'Variation Effect', ticks0, ticke0)
+    ticke0 = 1 
+    cbaxes0 = fig.add_axes([0.15, 0.15, 0.2, 0.02])
+    colorbar(heatmap, cbaxes0, ticks0, ticke0)
     
-    # Draw heatmap for gene expression: cold
+    # Draw heatmap for gene expression
     #ax = fig.add_subplot(132, frame_on=False) 
     ax1 = plt.subplot(gs[1])
-    heatmap = ax1.pcolor(rnaseq1, cmap=plt.cm.cool, vmin= -2, vmax= 2, alpha=0.8)  
-    plt.title('Cold', y=1.065) 
+    heatmap = ax1.pcolor(rnaseq, cmap=plt.cm.cool, alpha=0.8)    
     # Set names for x_ticks only
-    ax1 = set_ticks_X(ax1, rnaseq1.shape[1], rnaseq1.columns)
-    #ax = fig.add_subplot(133, frame_on=True)
+    ax1 = set_ticks_X(ax1, rnaseq.shape[1], rnaseq.columns)
     
     ticks1 = -2
-    ticke1 = 2
-    cbaxes1 = fig.add_axes([0.47, 0.18, 0.2, 0.02])
-    colorbar(heatmap, cbaxes1, 'Log2(HEG4/NB)', ticks1, ticke1)
-
-   # Draw heatmap for gene expression: drought
-    #ax = fig.add_subplot(132, frame_on=False) 
-    ax2 = plt.subplot(gs[2])
-    heatmap = ax2.pcolor(rnaseq2, cmap=plt.cm.cool, vmin= -2, vmax= 2, alpha=0.8)
-    plt.title('Drought', y=1.065) 
-    # Set names for x_ticks only
-    ax2 = set_ticks_X(ax2, rnaseq2.shape[1],  rnaseq2.columns)
-
-    # Draw heatmap for gene expression: salt
-    #ax = fig.add_subplot(132, frame_on=False) 
-    ax3 = plt.subplot(gs[3])
-    heatmap = ax3.pcolor(rnaseq3, cmap=plt.cm.cool, vmin= -2, vmax= 2, alpha=0.8)
-    plt.title('Salt', y=1.065) 
-    # Set names for x_ticks only
-    ylabs = anno['Annotation']
-    ax3 = set_ticks_XY_Right(ax3, rnaseq3.shape[0], rnaseq3.shape[1], rnaseq3.columns, ylabs)
-    
+    ticke1 = 4
+    cbaxes1 = fig.add_axes([0.5, 0.15, 0.2, 0.02])
+    colorbar(heatmap, cbaxes1, ticks1, ticke1)
  
     # Draw LOD curve
-    #ax2 = plt.subplot(gs[2])
-    #x=random.sample(range(1,20),6)
-    #y=np.arange(6)
-    #plt.xlim=(10,20)
-    #ax2.plot(x,y)
+    #ax = fig.add_subplot(133, frame_on=True)
+    ax2 = plt.subplot(gs[2])
+    x=random.sample(range(1,20),6)
+    y=np.arange(6)
+    plt.xlim=(10,20)
+    ax2.plot(x,y)
     # Set names for x_ticks 
     #ax2 = set_ticks_X(ax2)
 

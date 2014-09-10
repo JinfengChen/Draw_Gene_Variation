@@ -1,2 +1,2 @@
-rm *.table *.annotation *.gff
+rm *.table *.annotation *.gff *.annotation.brief
 
